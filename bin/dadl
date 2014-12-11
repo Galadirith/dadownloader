@@ -1,15 +1,13 @@
 #! /usr/bin/env python
 
-import sys
-from dadownloader.auth import auth
+import  sys
+import  json
+from    dadownloader.auth        import auth
+from    dadownloader.favourites  import Favourites
 
-print(sys.argv[1])
-
-session = auth()
-for cookie in session.cookies:
-  print(cookie.name+': '+cookie.value)
-  print('expires: %i' % cookie.expires)
-
-restricted = session.get('http://rangerred09.deviantart.com/art/The-Writer-and-the-Switchblade-425505247')
-with open('restricted.html', 'w') as f:
-  f.write(restricted.text)
+if len(sys.argv) == 2:
+  session     = auth()
+  favourites  = Favourites(sys.argv[1], session)
+  print(json.dumps(favourites.collections, indent=2))
+else:
+  print('Wrong number of arguments: %i' % (len(sys.argv)-1))
