@@ -9,3 +9,7 @@ session = auth()
 for cookie in session.cookies:
   print(cookie.name+': '+cookie.value)
   print('expires: %i' % cookie.expires)
+
+restricted = session.get('http://rangerred09.deviantart.com/art/The-Writer-and-the-Switchblade-425505247')
+with open('restricted.html', 'w') as f:
+  f.write(restricted.text)
