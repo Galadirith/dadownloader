@@ -1,3 +1,11 @@
 #! /usr/bin/env python
 
-print('hello, world')
+import sys
+from dadownloader.auth import auth
+
+print(sys.argv[1])
+
+session = auth()
+for cookie in session.cookies:
+  print(cookie.name+': '+cookie.value)
+  print('expires: %i' % cookie.expires)
