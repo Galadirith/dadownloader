@@ -1,8 +1,10 @@
 import  math
 import  time
-from    dadownloader.progressbar    import progressBar
-from    StringIO                    import StringIO
-from    lxml                        import etree
+from    dadownloader.progressbar            import progressBar
+from    dadownloader.deviation.deviation    import Deviation
+from    StringIO                            import StringIO
+from    lxml                                import etree
+from    collections                         import OrderedDict
 
 class Collection:
     """
@@ -21,6 +23,12 @@ class Collection:
     """
 
     def __init__(self, name, url, session):
+        """
+        :param str name: Name of the collection
+        :param str url: URL to the collection
+        :param requests.Session session: An instance through which all remote
+            requests should be made.
+        """
         self.name       = name
         self.url        = url
         self.collection = []
@@ -35,22 +43,29 @@ class Collection:
         print(' '+self.name)
 
         # Generate ElementTree list of every page in the collection
-        pages = self.grabPages()
+        pages, deviationsCount = self.grabPages()
 
-        for page in pages:
+        # Start a progress bar to report deviations with meta data harvested
+        progressBar('  Deviations\t', 0, deviationsCount)
+
+        for i in range(len(pages)):
             # Generate div list for all non-stored deviations
-            deviations = page.xpath('//div[span/span[@class="tt-fh-tc" and span/a/@class!="instorage"]]')
+            deviations = pages[i].xpath(
+                '//div[span/span['\
+                '@class="tt-fh-tc" and span/a/@class!="instorage"]]')
 
             # Push the deviation into the collection
-            for deviation in deviations:
-                self.pushFav(deviation)
+            for j in range(len(deviations)):
+                self.pushFav(deviations[j])
+                progressBar('  Deviations\t', j+1+i*24, deviationsCount)
 
     def grabPages(self):
         """
         Generates a list of ElementTree's of every page in the collection
 
-        :rtype: lxml.etree.ElementTree[]
-        :return: List of every page in the collection.
+        :rtype: (lxml.etree.ElementTree[], int)
+        :return: (List of every page in the collection, number of deviations in
+            the collection)
         """
         # Request the collections root page
         rootResponse    = self.session.get(self.url)
@@ -62,7 +77,7 @@ class Collection:
         pagesCount      = int(math.ceil(float(deviationsCount)/24))
 
         # Start a progress bar to report pages downloaded
-        progressBar('  Pages', 1, pagesCount)
+        progressBar('  Pages\t', 1, pagesCount)
 
         # Now request any further pages that exist in the collection
         pagesResponses = []
@@ -72,7 +87,7 @@ class Collection:
             )
             # Be kind to the server
             time.sleep(1)
-            progressBar('  Pages', i+2, pagesCount)
+            progressBar('  Pages\t', i+2, pagesCount)
 
         # Prepare ElementTree's from each response
         pagesXML = []
@@ -82,7 +97,7 @@ class Collection:
         # Add the root page to the begining of teh list
         pagesXML.insert(0, rootXML)
 
-        return pagesXML
+        return (pagesXML, int(deviationsCount))
 
     def pushFav(self, deviation):
         """
@@ -98,8 +113,21 @@ class Collection:
         filmURL = deviation.xpath('.//span[@class="tt-fh-tc"]//b[@class="film"]')
 
         if len(imgURL) != 0:
-            self.collection.append({'type': 'img', 'imgurl': imgURL[0]})
+            self.collection.append(Deviation('img', deviation, self.session))
         elif len(filmURL) != 0:
-            self.collection.append({'type': 'film', 'filmurl': filmURL[0]})
+            self.collection.append(Deviation('film', deviation, self.session))
         else:
-            self.collection.append({'type': 'data'})
+            self.collection.append(Deviation('data', deviation, self.session))
+
+    def toDict(self):
+        """Return the instance fields as a dictionary"""
+        # Compile just the fields of the deviations
+        collection = []
+        for deviation in self.collection:
+            collection.append(deviation.toDict())
+
+        return OrderedDict((
+            ('name',         self.name),
+            ('url',          self.url),
+            ('collection',   collection)
+        ))

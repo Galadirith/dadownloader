@@ -1,6 +1,7 @@
 from    dadownloader.collection import Collection
 from    StringIO                import StringIO
 from    lxml                    import etree
+from    collections             import OrderedDict
 
 class Favourites:
     """
@@ -60,3 +61,15 @@ class Favourites:
         # Push each sub-collection to collections
         for i in range(len(colNames)):
             self.pushCol(colNames[i], colURLs[i])
+
+    def toDict(self):
+        """Return the instance fields as a dictionary"""
+        # Compile just the fields of the collections
+        collections = []
+        for collection in self.collections:
+            collections.append(collection.toDict())
+
+        return OrderedDict((
+            ('url',          self.url),
+            ('collections',  collections)
+        ))
