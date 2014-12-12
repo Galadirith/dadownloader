@@ -1,5 +1,6 @@
-from    StringIO    import StringIO
-from    lxml        import etree
+from    dadownloader.collection import Collection
+from    StringIO                import StringIO
+from    lxml                    import etree
 
 class Favourites:
     """
@@ -11,8 +12,8 @@ class Favourites:
 
     :var str url: URL to the deviants user page to whom the favourites belong.
     :var str favurl: URL to the favourites page.
-    :var dadownloader.collection[] collections: List of collections including
-        the root collection of the users favourites.
+    :var dadownloader.collection.Collection[] collections: List of collections
+        including the root collection of the users favourites.
     :var requests.Session session: An instance through which all remote requests
         should be made.
     """
@@ -38,7 +39,8 @@ class Favourites:
         :param str name: Name of the collection
         :param str url: URL to the collection
         """
-        self.collections.append({'name': name, 'url': url})
+        collection = Collection(name, url, self.session)
+        self.collections.append(collection)
 
     def grabCols(self):
         """Adds every favourite collection to the container"""

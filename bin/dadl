@@ -8,6 +8,8 @@ from    dadownloader.favourites  import Favourites
 if len(sys.argv) == 2:
   session     = auth()
   favourites  = Favourites(sys.argv[1], session)
-  print(json.dumps(favourites.collections, indent=2))
+  # For testing lets dump the root collection
+  with open(sys.argv[1]+'.json', 'w+') as f:
+    json.dump(favourites.collections[0].collection, f, indent=2)
 else:
   print('Wrong number of arguments: %i' % (len(sys.argv)-1))
