@@ -28,7 +28,7 @@ class Img(Deviation):
                     './/span[@class="tt-fh-tc"]//a/@data-super-full-img')[0]
             except IndexError:
                 self.imgurl = deviation.xpath(
-                    '//span[@class="tt-fh-tc"]//a/@data-super-img')[0]
+                    './/span[@class="tt-fh-tc"]//a/@data-super-img')[0]
         else:
             self.imgurl = page.xpath('//img[@class="dev-content-full"]/@src')[0]
 
