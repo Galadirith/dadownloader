@@ -22,12 +22,13 @@ class Data(Deviation):
     :var str dataurl: URL to the data file.
     """
 
-    def __init__(self, deviation, session):
+    def __init__(self, deviation, session, page=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param lxml.etree.Element page: The deviations page.
         """
         Deviation.__init__(self, 'data', deviation, session)
 
@@ -40,11 +41,14 @@ class Data(Deviation):
         self.thumb  = basename(parsedURL[2])
 
         # To determine data file details we have to load the deviations page
-        page = self.session.get(self.url)
+        if page == None:
+            page    = self.session.get(self.url)
+            parser  = etree.HTMLParser()
+            pageXML = etree.parse(StringIO(page.text), parser)
+        else:
+            pageXML = page
 
         # The details of the data file can be found in json string embedded in
-        parser       = etree.HTMLParser()
-        pageXML      = etree.parse(StringIO(page.text), parser)
         self.dataurl = pageXML.xpath(
             '//a[contains(@class,"dev-page-download")]/@href')[0]
         parsedURL    = urlparse(self.dataurl)

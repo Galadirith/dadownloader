@@ -17,12 +17,13 @@ class Film(Deviation):
     :var str filmurl: URL to the film file.
     """
 
-    def __init__(self, deviation, session):
+    def __init__(self, deviation, session, page=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param lxml.etree.Element page: The deviations page.
         """
         Deviation.__init__(self, 'film', deviation, session)
 

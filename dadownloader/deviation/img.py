@@ -11,22 +11,26 @@ class Img(Deviation):
     :var str imgurl: URL to the img.
     """
 
-    def __init__(self, deviation, session):
+    def __init__(self, deviation, session, page=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param lxml.etree.Element page: The deviations page.
         """
         Deviation.__init__(self, 'img', deviation, session)
 
-        # If imgurl is not under ...-full-img it is under ...-img
-        try:
-            self.imgurl = deviation.xpath(
-                './/span[@class="tt-fh-tc"]//a/@data-super-full-img')[0]
-        except IndexError:
-            self.imgurl = deviation.xpath(
-                '//span[@class="tt-fh-tc"]//a/@data-super-img')[0]
+        if page == None:
+            # If imgurl not under data-super-full-img it is under data-super-img
+            try:
+                self.imgurl = deviation.xpath(
+                    './/span[@class="tt-fh-tc"]//a/@data-super-full-img')[0]
+            except IndexError:
+                self.imgurl = deviation.xpath(
+                    '//span[@class="tt-fh-tc"]//a/@data-super-img')[0]
+        else:
+            self.imgurl = page.xpath('//img[@class="dev-content-full"]/@src')[0]
 
         # Extract the filename of the img
         parsedURL   = urlparse(self.imgurl)

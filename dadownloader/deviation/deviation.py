@@ -10,9 +10,11 @@ class Deviation:
     description, creator etc.
 
     :var str type: Type of deviation. This can take the values
-        IMG     =='An Image ;D'
-        FILM    =='A Film'
-        DATA    =='All other binary formats'
+        img     == 'An Image ;D'
+        film    == 'A Film'
+        text    == 'A text file'
+        data    == 'All other binary formats'
+        unknown == 'Unknown deviation type'
     :var str title: Title of the deviation.
     :var str url: URL to the deviations page.
     :var str creator: Deviant who created the deviation.

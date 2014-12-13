@@ -112,15 +112,52 @@ class Collection:
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         """
-        imgURL  = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@data-super-img')
-        filmURL = deviation.xpath('.//span[@class="tt-fh-tc"]//b[@class="film"]')
-
-        if len(imgURL) != 0:
+        # Is it an img deviation?
+        devType = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@data-super-img')
+        if len(devType) == 1:
             self.collection.append(Img(deviation, self.session))
-        elif len(filmURL) != 0:
+            return
+
+        # Is is a film deviation?
+        devType = deviation.xpath('.//span[@class="tt-fh-tc"]//b[@class="film"]')
+        if len(devType) == 1:
             self.collection.append(Film(deviation, self.session))
+            return
+
+        # Is it a text deviation? Currently no explict handler class
+        devType = deviation.xpath('.//span[@class="tt-fh-tc"]//img[@class="lit"]')
+        if len(devType) == 1:
+            self.collection.append(Deviation('text', deviation, self.session))
+            return
+
+        # If inconclusive we must open the deviations page to determine its type
+        # as there has been a case where an img deviation has no @data-super-img
+        # attribute
+        url     = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@href')[0]
+        page    = self.session.get(url)
+        parser  = etree.HTMLParser()
+        pageXML = etree.parse(StringIO(page.text), parser)
+
+        # Is there an img size?
+        imgSize = pageXML.xpath(
+            '//div[contains(@class,"dev-metainfo-details")]'\
+            '/dl/dt[text()="Image Size"]')
+        if len(imgSize) == 0:
+             self.collection.append(Data(deviation, self.session, pageXML))
+             return
+
+        # Case on img and flash files that both have an imgSize
+        flash = pageXML.xpath('//div[@id="flashed-in"]')
+        if len(flash) == 1:
+            self.collection.append(Data(deviation, self.session, pageXML))
+            return
         else:
-            self.collection.append(Data(deviation, self.session))
+            self.collection.append(Img(deviation, self.session, pageXML))
+            return
+
+        # It it reaches here then the type is indeterminable
+        self.collection.append(Deviation('unknown', deviation, self.session))
+
 
     def toDict(self):
         """Return the instance fields as a dictionary"""
