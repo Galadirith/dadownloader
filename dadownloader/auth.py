@@ -19,8 +19,9 @@ def auth():
     :rtype: requests.Session
     :return:
         If a 'cookies' file exists in the calling directory, auth will assume
-        this is a pickle dump of a valid cookiejar and return an object with
-        cookies set from the 'cookies' file regardless of the parameters passed.
+        this is a pickle dump of a valid cookiejar and deterimine if that are
+        authenticated cookies for DeviantArt. If they are not auth() will
+        proceed to request login credentials.
 
         If valid credentials are provided, the returned object contains
         authenticated cookies.
@@ -35,13 +36,25 @@ def auth():
     session                         = requests.Session()
     session.headers['User-Agent']   = userAgent
 
-    # Assume authenticated cookies exist if 'cookies' file exists
+    # Check for authenticated cookies
     if os.path.isfile('cookies'):
         with open('cookies', 'rb') as f:
             session.cookies = pickle.load(f)
-        return session
 
-    print('To access restricted content please provide login credentials')
+        # Request the DeviantArt login page
+        response = session.get(url, headers={'Referer': url})
+
+        # Query element that only exists for loged in users
+        parser  = etree.HTMLParser()
+        doc     = etree.parse(StringIO(response.text), parser)
+        login   = doc.xpath('//*[@id="oh-menu-deviant"]/a/span')
+        if len(login) == 1:
+            print('Cookies are good')
+            return session
+        else:
+            print('Cookies are bad')
+
+    print('If you want to access restricted content please provide login credentials')
     username = raw_input('Username: ')
     password = getpass.getpass()
 
