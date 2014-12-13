@@ -69,5 +69,6 @@ class Film(Deviation):
             ('film',        self.film),
             ('filmurl',     self.filmurl),
             ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl)
+            ('avatarurl',   self.avatarurl),
+            ('submitted',   self.submitted)
         ))

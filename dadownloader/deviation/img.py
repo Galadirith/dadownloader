@@ -47,5 +47,6 @@ class Img(Deviation):
             ('img',         self.img),
             ('imgurl',      self.imgurl),
             ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl)
+            ('avatarurl',   self.avatarurl),
+            ('submitted',   self.submitted)
         ))

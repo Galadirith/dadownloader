@@ -1,6 +1,9 @@
-from urlparse       import urlparse
-from os.path        import basename
-from collections    import OrderedDict
+from urlparse           import urlparse
+from os.path            import basename
+from collections        import OrderedDict
+from datetime           import datetime
+from calendar           import timegm
+import re
 
 class Deviation:
     """
@@ -21,6 +24,7 @@ class Deviation:
     :var str creatorurl: URL to the deviant who created the deviation.
     :var str avatar: File name + extension of the avatar of the creator.
     :var str avatarurl: URL of the avatar of the creator.
+    :var int submitted: Unix timestamp for the date the deviation was submitted.
     :var requests.Session session: An instance through which all remote requests
         should be made.
     """
@@ -63,6 +67,14 @@ class Deviation:
         parsedURL   = urlparse(self.avatarurl)
         self.avatar = basename(parsedURL[2])
 
+        # Determine Submission date
+        datestr = deviation.xpath(
+            './/span[@class="tt-fh-tc"]/'\
+            'following-sibling::span[@class="details"]/a/@title')[0]
+        datestr         = re.sub(r'^.*?, (?=(?:.{3} .{1,2}?, .{4}))', r'', datestr)
+        date            = datetime.strptime(datestr, '%b %d, %Y')
+        self.submitted  = timegm(date.timetuple())
+
     def toDict(self):
         """Return the instance fields as a dictionary"""
         return OrderedDict((
@@ -72,5 +84,6 @@ class Deviation:
             ('creator',     self.creator),
             ('creatorurl',  self.creatorurl),
             ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl)
+            ('avatarurl',   self.avatarurl),
+            ('submitted',   self.submitted)
         ))

@@ -67,5 +67,6 @@ class Data(Deviation):
             ('data',        self.data),
             ('dataurl',     self.dataurl),
             ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl)
+            ('avatarurl',   self.avatarurl),
+            ('submitted',   self.submitted)
         ))
