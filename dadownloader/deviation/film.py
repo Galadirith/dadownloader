@@ -55,8 +55,6 @@ class Film(Deviation):
         parsedURL       = urlparse(self.filmurl)
         self.film       = basename(parsedURL[2])
 
-        self.session = session
-
     def toDict(self):
         """Override parent and return the instance fields as a dictionary"""
         return OrderedDict((

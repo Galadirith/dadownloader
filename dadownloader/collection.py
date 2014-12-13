@@ -4,6 +4,7 @@ from    dadownloader.progressbar            import progressBar
 from    dadownloader.deviation.deviation    import Deviation
 from    dadownloader.deviation.img          import Img
 from    dadownloader.deviation.film         import Film
+from    dadownloader.deviation.data         import Data
 from    StringIO                            import StringIO
 from    lxml                                import etree
 from    collections                         import OrderedDict
@@ -119,7 +120,7 @@ class Collection:
         elif len(filmURL) != 0:
             self.collection.append(Film(deviation, self.session))
         else:
-            self.collection.append(Deviation('data', deviation, self.session))
+            self.collection.append(Data(deviation, self.session))
 
     def toDict(self):
         """Return the instance fields as a dictionary"""

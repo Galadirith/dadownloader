@@ -32,8 +32,6 @@ class Img(Deviation):
         parsedURL   = urlparse(self.imgurl)
         self.img    = basename(parsedURL[2])
 
-        self.session = session
-
     def toDict(self):
         """Override parent and return the instance fields as a dictionary"""
         return OrderedDict((
