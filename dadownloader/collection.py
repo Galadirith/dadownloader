@@ -2,6 +2,8 @@ import  math
 import  time
 from    dadownloader.progressbar            import progressBar
 from    dadownloader.deviation.deviation    import Deviation
+from    dadownloader.deviation.img          import Img
+from    dadownloader.deviation.film         import Film
 from    StringIO                            import StringIO
 from    lxml                                import etree
 from    collections                         import OrderedDict
@@ -113,9 +115,9 @@ class Collection:
         filmURL = deviation.xpath('.//span[@class="tt-fh-tc"]//b[@class="film"]')
 
         if len(imgURL) != 0:
-            self.collection.append(Deviation('img', deviation, self.session))
+            self.collection.append(Img(deviation, self.session))
         elif len(filmURL) != 0:
-            self.collection.append(Deviation('film', deviation, self.session))
+            self.collection.append(Film(deviation, self.session))
         else:
             self.collection.append(Deviation('data', deviation, self.session))
 

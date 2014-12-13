@@ -6,7 +6,7 @@ class Deviation:
     """
     A single deviation
 
-    This Object encapsulates the data for a single deviation including img name,
+    This Object encapsulates the data for a single deviation including name,
     description, creator etc.
 
     :var str type: Type of deviation. This can take the values
@@ -23,7 +23,7 @@ class Deviation:
         should be made.
     """
 
-    def __init__(self, type, deviation, session ):
+    def __init__(self, type, deviation, session):
         """
         :param str type: Type of deviation.
         :param lxml.etree.Element deviation: A div element from a collections
@@ -65,10 +65,10 @@ class Deviation:
         """Return the instance fields as a dictionary"""
         return OrderedDict((
             ('type',        self.type),
-            ('title',        self.title),
-            ('url',          self.url),
-            ('creator',      self.creator),
-            ('creatorurl',   self.creatorurl),
-            ('avatar',       self.avatar),
-            ('avatarurl',    self.avatarurl)
+            ('title',       self.title),
+            ('url',         self.url),
+            ('creator',     self.creator),
+            ('creatorurl',  self.creatorurl),
+            ('avatar',      self.avatar),
+            ('avatarurl',   self.avatarurl)
         ))
