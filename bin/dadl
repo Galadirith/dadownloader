@@ -3,11 +3,11 @@
 import  sys
 import  json
 import  os
-from    dadownloader.auth        import auth
+from    dadownloader.auth        import Auth
 from    dadownloader.favourites  import Favourites
 
 if len(sys.argv) == 2:
-  session = auth()
+  session = Auth().auth()
   try:
     os.mkdir(sys.argv[1])
   except OSError:
