@@ -12,6 +12,7 @@ if len(sys.argv) == 2:
     os.mkdir(sys.argv[1])
   except OSError:
     pass
+  # Change working directory
   os.chdir(sys.argv[1])
   favourites  = Favourites(sys.argv[1], session)
   with open(sys.argv[1]+'.json', 'w+') as f:

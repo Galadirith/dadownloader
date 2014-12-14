@@ -116,6 +116,9 @@ class Deviation:
         :param str path: Directory path to where the resources should be
             downloaded. Default to current working directory.
         """
+
+        # STAGE 1: Download description html
+
         # Create description directory if it doesn't exist
         path = os.path.join(path,'descriptions')
         path = os.path.normpath(path)
@@ -144,5 +147,60 @@ class Deviation:
 
         # Find the description
         description = pageXML.xpath(
-            '//div[contains(@class,"dev-description")]')[0]
+            '//div[contains(@class,"dev-description")]'\
+            '//div[@class="text block"]')[0]
+        f.write(etree.tostring(description, pretty_print=True))
+
+        # STAGE 2: Download description images and point descriptions as them
+
+        # Create imgs directory if it doesn't exist
+        imgPath = os.path.join(path,'imgs')
+        imgPath = os.path.normpath(imgPath)
+        try:
+            os.mkdir(imgPath)
+        except OSError:
+            pass
+
+        # Find all img elements, download associated images and fix html
+        imgs = description.xpath('.//img')
+        for img in imgs:
+            # Fix img src to point at local file
+            url                 = img.attrib['src']
+            parsedURL           = urlparse(url)
+            imgFilename         = basename(parsedURL[2])
+            relImgFilepath      = os.path.join('imgs',imgFilename)
+            relImgFilepath      = os.path.normpath(relImgFilepath)
+            img.attrib['src']   = relImgFilepath
+
+            # Download img
+            try:
+                # os.O_BINARY is only avilable and needed on windows
+                try:
+                    flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+                except:
+                    flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                imgFilepath = os.path.join(imgPath,imgFilename)
+                fd          = os.open(os.path.normpath(imgFilepath), flags)
+            except:
+                continue
+
+            response = self.session.get(url, stream=True)
+            if response.status_code == 200:
+                for chunk in response.iter_content(1024):
+                    os.write(fd, chunk)
+
+        # Construct a filename for the fixed description
+        parsedURL   = urlparse(self.url)
+        filename    = os.path.basename(parsedURL[2])+'.html'
+
+        # Write fixed description html to file
+        description.attrib['class'] = "description"
+        try:
+            flags       = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            filepath    = os.path.join(path,filename)
+            fd          = os.open(os.path.normpath(filepath), flags)
+            f           = os.fdopen(fd, 'w')
+        except:
+            return
+
         f.write(etree.tostring(description, pretty_print=True))
