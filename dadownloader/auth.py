@@ -6,9 +6,17 @@ from    StringIO    import StringIO
 from    lxml        import etree
 
 class Auth:
-    """Attempt to generate an authenticated session for DeviantArt."""
+    """
+    Attempt to generate an authenticated session for DeviantArt.
+
+    :param str url: https://www.deviantart.com/users/login
+    :param requests.Session session: Session object through which all remote
+        requests to DeviantArt should be made.
+    """
 
     def __init__(self):
+        self.url        = 'https://www.deviantart.com/users/login'
+        self.session    = self.createSession()
         pass
 
     def auth(self):
@@ -34,43 +42,36 @@ class Auth:
             If no or invalid credentials are provided, the returned object will
             contain no authenticated cookies.
         """
-        url         =   'https://www.deviantart.com/users/login'
-        userAgent   =   'Mozilla/5.0 (Windows NT 6.1; WOW64) '\
-                        'AppleWebKit/537.36 (KHTML, like Gecko) '\
-                        'Chrome/39.0.2171.71 Safari/537.36'
-        session                         = requests.Session()
-        session.headers['User-Agent']   = userAgent
+        url     = self.url
+        session = self.session
 
         # Check for authenticated cookies
         if os.path.isfile('cookies'):
+
             with open('cookies', 'rb') as f:
                 session.cookies = pickle.load(f)
 
-            # Request the DeviantArt login page
-            response = session.get(url, headers={'Referer': url})
-
-            # Query element that only exists for loged in users
-            parser  = etree.HTMLParser()
-            doc     = etree.parse(StringIO(response.text), parser)
-            login   = doc.xpath('//*[@id="oh-menu-deviant"]/a/span')
-            if len(login) == 1:
+            status = self.verify()
+            if status == 'GOOD':
                 print('Cookies are good')
                 return session
-            else:
+            elif status == 'BAD':
                 print('Cookies are bad')
 
         # Start a new/clean session
-        session                         = requests.Session()
-        session.headers['User-Agent']   = userAgent
+        session = self.createSession()
 
         # Reqeust login credentials from the user
         print(\
             'If you want to access restricted content '\
-            'please provide login credentials')
+            'please provide login credentials.')
         username = raw_input('Username: ')
         password = getpass.getpass()
 
         if username == '' or password == '':
+            print(\
+                'Your username or password is empty. '\
+                'Continuing unauthenticated.')
             return session
 
         # Request the DeviantArt login page
@@ -97,4 +98,43 @@ class Auth:
         with open('cookies', 'w+b') as f:
             pickle.dump(session.cookies, f)
 
+        # Assign the new session to the instance field self.session
+        self.session = session
+
+        # Check for authenticated cookies
+        status = self.verify()
+        if status == 'BAD':
+            print('Cookies are bad. Continuing unauthenticated.')
+
         return session
+
+    def createSession(self):
+        """Create a new session for remote requests to DeviantArt"""
+
+        userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) '\
+                    'AppleWebKit/537.36 (KHTML, like Gecko) '\
+                    'Chrome/39.0.2171.71 Safari/537.36'
+        session                         = requests.Session()
+        session.headers['User-Agent']   = userAgent
+
+        return session
+
+    def verify(self):
+        """
+        Check if the current session is logged in to DeviantArt
+
+        :rtype: str
+        :return: If the session is logged in to DeviantArt return 'GOOD',
+            otherwise return 'BAD'.
+        """
+        # Request the DeviantArt login page
+        response = self.session.get(self.url, headers={'Referer': self.url})
+
+        # Query element that only exists for loged in users
+        parser  = etree.HTMLParser()
+        doc     = etree.parse(StringIO(response.text), parser)
+        login   = doc.xpath('//*[@id="oh-menu-deviant"]/a/span')
+        if len(login) == 1:
+            return 'GOOD'
+        else:
+            return 'BAD'
