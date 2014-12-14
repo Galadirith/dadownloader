@@ -1,5 +1,6 @@
 import  math
 import  time
+import  os
 from    dadownloader.progressbar            import progressBar
 from    dadownloader.deviation.deviation    import Deviation
 from    dadownloader.deviation.img          import Img
@@ -37,6 +38,12 @@ class Collection:
         self.collection = []
         self.session    = session
 
+        try:
+            os.mkdir(self.name)
+        except OSError:
+            # Passed if folder exists so its probably OK :D
+            pass
+
         self.grabCol()
 
     def grabCol(self):
@@ -60,6 +67,7 @@ class Collection:
             # Push the deviation into the collection
             for j in range(len(deviations)):
                 self.pushFav(deviations[j])
+                self.collection[-1].download(self.name)
                 progressBar('  Deviations\t', j+1+i*24, deviationsCount)
 
     def grabPages(self):

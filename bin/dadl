@@ -2,11 +2,17 @@
 
 import  sys
 import  json
+import  os
 from    dadownloader.auth        import auth
 from    dadownloader.favourites  import Favourites
 
 if len(sys.argv) == 2:
-  session     = auth()
+  session = auth()
+  try:
+    os.mkdir(sys.argv[1])
+  except OSError:
+    pass
+  os.chdir(sys.argv[1])
   favourites  = Favourites(sys.argv[1], session)
   with open(sys.argv[1]+'.json', 'w+') as f:
     json.dump(favourites.toDict(), f, indent=2)

@@ -72,3 +72,12 @@ class Film(Deviation):
             ('avatarurl',   self.avatarurl),
             ('submitted',   self.submitted)
         ))
+
+    def download(self, path=''):
+        """
+        Download resources associated with deviation
+
+        :param str path: Directory path to where the resources should be
+            downloaded. Default to current working directory.
+        """
+        return

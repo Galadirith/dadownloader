@@ -2,6 +2,7 @@ from dadownloader.deviation.deviation   import Deviation
 from urlparse                           import urlparse
 from os.path                            import basename
 from collections                        import OrderedDict
+import os
 
 class Img(Deviation):
     """
@@ -50,3 +51,27 @@ class Img(Deviation):
             ('avatarurl',   self.avatarurl),
             ('submitted',   self.submitted)
         ))
+
+    def download(self, path=''):
+        """
+        Download image file associated with deviation
+
+        :param str path: Directory path to where the resources should be
+            downloaded. Default to current working directory.
+        """
+        # os.open *should* give a thread-safe way to exlusivly open files
+        try:
+            # os.O_BINARY is only avilable and needed on windows
+            try:
+                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+            except:
+                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            filepath    = os.path.join(path,self.img)
+            fd          = os.open(os.path.normpath(filepath), flags)
+        except:
+            return
+
+        response = self.session.get(self.imgurl, stream=True)
+        if response.status_code == 200:
+            for chunk in response.iter_content(1024):
+                os.write(fd, chunk)
