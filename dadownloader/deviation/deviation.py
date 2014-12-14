@@ -76,16 +76,21 @@ class Deviation:
         self.submitted  = timegm(date.timetuple())
 
     def toDict(self):
-        """Return the instance fields as a dictionary"""
+        """
+        Return the instance fields as a dictionary
+
+        :rtype: OrderedDict
+        :return: An ordered dictionary of the instance fields of this deviation.
+        """
         return OrderedDict((
             ('type',        self.type),
             ('title',       self.title),
+            ('submitted',   self.submitted),
             ('url',         self.url),
             ('creator',     self.creator),
             ('creatorurl',  self.creatorurl),
             ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl),
-            ('submitted',   self.submitted)
+            ('avatarurl',   self.avatarurl)
         ))
 
     def download(self, path=''):

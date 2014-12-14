@@ -55,21 +55,20 @@ class Data(Deviation):
         self.data    = basename(parsedURL[2])
 
     def toDict(self):
-        """Override parent and return the instance fields as a dictionary"""
-        return OrderedDict((
-            ('type',        self.type),
-            ('title',       self.title),
-            ('url',         self.url),
-            ('creator',     self.creator),
-            ('creatorurl',  self.creatorurl),
+        """
+        Return the instance fields as a dictionary
+
+        :rtype: OrderedDict
+        :return: An ordered dictionary of the instance fields of this deviation.
+        """
+        fields = Deviation.toDict(self)
+        fields.update((
             ('thumb',       self.thumb),
             ('thumburl',    self.thumburl),
             ('data',        self.data),
-            ('dataurl',     self.dataurl),
-            ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl),
-            ('submitted',   self.submitted)
+            ('dataurl',     self.dataurl)
         ))
+        return fields
 
     def download(self, path=''):
         """

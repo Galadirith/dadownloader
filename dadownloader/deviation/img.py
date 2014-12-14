@@ -38,19 +38,18 @@ class Img(Deviation):
         self.img    = basename(parsedURL[2])
 
     def toDict(self):
-        """Override parent and return the instance fields as a dictionary"""
-        return OrderedDict((
-            ('type',        self.type),
-            ('title',       self.title),
-            ('url',         self.url),
-            ('creator',     self.creator),
-            ('creatorurl',  self.creatorurl),
-            ('img',         self.img),
-            ('imgurl',      self.imgurl),
-            ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl),
-            ('submitted',   self.submitted)
+        """
+        Return the instance fields as a dictionary
+
+        :rtype: OrderedDict
+        :return: An ordered dictionary of the instance fields of this deviation.
+        """
+        fields = Deviation.toDict(self)
+        fields.update((
+            ('img',     self.img),
+            ('imgurl',  self.imgurl)
         ))
+        return fields
 
     def download(self, path=''):
         """
