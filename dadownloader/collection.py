@@ -69,6 +69,7 @@ class Collection:
                 self.pushFav(deviations[j])
                 self.collection[-1].download(self.name)
                 self.collection[-1].downloadDescription(self.name)
+                self.collection[-1].downloadAvatar()
                 progressBar('  Deviations\t', j+1+i*24, deviationsCount)
 
     def grabPages(self):

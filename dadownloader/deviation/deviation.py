@@ -204,3 +204,30 @@ class Deviation:
             return
 
         f.write(etree.tostring(description, pretty_print=True))
+
+    def downloadAvatar(self):
+        """Download the Avatar of the creator of the deviation"""
+
+        # Create avatars directory in the working directory if it doesn't exist
+        path = 'avatars'
+        try:
+            os.mkdir(path)
+        except OSError:
+            pass
+
+        # os.open *should* give a thread-safe way to exlusivly open files
+        try:
+            # os.O_BINARY is only avilable and needed on windows
+            try:
+                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+            except:
+                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            filepath    = os.path.join(path,self.avatar)
+            fd          = os.open(os.path.normpath(filepath), flags)
+        except:
+            return
+
+        response = self.session.get(self.avatarurl, stream=True)
+        if response.status_code == 200:
+            for chunk in response.iter_content(1024):
+                os.write(fd, chunk)
