@@ -3,7 +3,10 @@ from os.path            import basename
 from collections        import OrderedDict
 from datetime           import datetime
 from calendar           import timegm
+from StringIO           import StringIO
+from lxml               import etree
 import re
+import os
 
 class Deviation:
     """
@@ -105,3 +108,41 @@ class Deviation:
             downloaded. Default to current working directory.
         """
         return
+
+    def downloadDescription(self, path=''):
+        """
+        Download description associated with deviation
+
+        :param str path: Directory path to where the resources should be
+            downloaded. Default to current working directory.
+        """
+        # Create description directory if it doesn't exist
+        path = os.path.join(path,'descriptions')
+        path = os.path.normpath(path)
+        try:
+            os.mkdir(path)
+        except OSError:
+            pass
+
+        # Construct a filename for the description
+        parsedURL   = urlparse(self.url)
+        filename    = os.path.basename(parsedURL[2])+'.original'
+
+        # os.open *should* give a thread-safe way to exlusivly open files
+        try:
+            flags       = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            filepath    = os.path.join(path,filename)
+            fd          = os.open(os.path.normpath(filepath), flags)
+            f           = os.fdopen(fd, 'w')
+        except:
+            return
+
+        # Load the page
+        page    = self.session.get(self.url)
+        parser  = etree.HTMLParser(remove_blank_text=True)
+        pageXML = etree.parse(StringIO(page.text), parser)
+
+        # Find the description
+        description = pageXML.xpath(
+            '//div[contains(@class,"dev-description")]')[0]
+        f.write(etree.tostring(description, pretty_print=True))
