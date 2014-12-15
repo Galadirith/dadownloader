@@ -70,15 +70,22 @@ class Auth:
         print(\
             'If you want to access restricted content '\
             'please provide login detail.')
+
         username = raw_input('Username: ')
+        if username == '':
+            print('Your username is empty. Continuing unauthenticated.')
+            return self.session
+
         password = getpass.getpass()
+        if password == '':
+            print('Your password is empty. Continuing unauthenticated.')
+            return self.session
 
         # Attempt to log in to DeviantArt
         print('Checking log in details')
         status = self.login(username, password)
         if status == 'GOOD':
             print('Log in details are good')
-            return self.session
         elif status == 'BAD':
             print('Log in details are bad. Continuing unauthenticated.')
 
@@ -111,6 +118,8 @@ class Auth:
         if len(login) == 1:
             return 'GOOD'
         else:
+            # Replace the bad session with a new/clean session
+            self.newSession()
             return 'BAD'
 
     def login(self, username, password):
@@ -129,17 +138,9 @@ class Auth:
         # Create new/clean session
         self.newSession()
 
-        # Check if credentials are empty
-        if username == '':
-            print(\
-                'Your username is empty. '\
-                'Continuing unauthenticated.')
-            return session
-        elif password == '':
-            print(\
-                'Your password is empty. '\
-                'Continuing unauthenticated.')
-            return self.session
+        # Check for empty credentials
+        if username == '' or password == '':
+            return 'BAD'
 
         # Request the DeviantArt login page
         response = self.session.get(self.url, headers={'Referer': self.url})
