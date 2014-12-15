@@ -16,11 +16,14 @@ class Deviation:
     description, creator etc.
 
     :var str type: Type of deviation. This can take the values
-        img     == 'An Image ;D'
-        film    == 'A Film'
-        text    == 'A text file'
-        data    == 'All other binary formats'
-        unknown == 'Unknown deviation type'
+        img         == An Image ;D
+        film        == A Film
+        text        == A text file
+        data        == All other binary formats
+        restricted  == A restricted deviation. This type will only occur if
+            session is not logged in to DeviantArt. All the xpath queries in
+            this class are valid for restricted content.
+        unknown     == 'Unknown deviation type'
     :var str title: Title of the deviation.
     :var str url: URL to the deviations page.
     :var str creator: Deviant who created the deviation.

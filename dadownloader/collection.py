@@ -148,6 +148,12 @@ class Collection:
         parser  = etree.HTMLParser()
         pageXML = etree.parse(StringIO(page.text), parser)
 
+        # Is the deviation restricted content?
+        restricted = pageXML.xpath('//div[@id="filter-warning"]')
+        if len(restricted) == 1:
+            self.collection.append(Deviation('restricted', deviation, self.session))
+            return
+
         # Is there an img size?
         imgSize = pageXML.xpath(
             '//div[contains(@class,"dev-metainfo-details")]'\
