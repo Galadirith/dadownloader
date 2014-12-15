@@ -56,7 +56,7 @@ class Collection:
         pages, deviationsCount = self.grabPages()
 
         # Start a progress bar to report deviations with meta data harvested
-        progressBar('  Deviations\t', 0, deviationsCount)
+        progressBar('  Deviations', 0, deviationsCount)
 
         for i in range(len(pages)):
             # Generate div list for all non-stored deviations
@@ -70,7 +70,7 @@ class Collection:
                 self.collection[-1].download(self.name)
                 self.collection[-1].downloadDescription(self.name)
                 self.collection[-1].downloadAvatar()
-                progressBar('  Deviations\t', j+1+i*24, deviationsCount)
+                progressBar('  Deviations', j+1+i*24, deviationsCount)
 
     def grabPages(self):
         """
@@ -90,7 +90,7 @@ class Collection:
         pagesCount      = int(math.ceil(float(deviationsCount)/24))
 
         # Start a progress bar to report pages downloaded
-        progressBar('  Pages\t', 1, pagesCount)
+        progressBar('  Pages', 1, pagesCount)
 
         # Now request any further pages that exist in the collection
         pagesResponses = []
@@ -100,7 +100,7 @@ class Collection:
             )
             # Be kind to the server
             time.sleep(1)
-            progressBar('  Pages\t', i+2, pagesCount)
+            progressBar('  Pages', i+2, pagesCount)
 
         # Prepare ElementTree's from each response
         pagesXML = []

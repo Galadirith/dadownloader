@@ -21,7 +21,7 @@ def progressBar(label, current, total):
 
     # Render progress bar and metadata
     progressbar = '|' * int(round(completion*30))
-    sys.stdout.write('\r %s [%-30.30s] %d%% (%i/%i)' % (
+    sys.stdout.write('\r%-20.20s [%-30.30s] %3d%% (%i/%i)' % (
         label, progressbar, int(round(completion*100)), current, total
     ))
     sys.stdout.flush()
