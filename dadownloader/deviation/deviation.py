@@ -135,13 +135,13 @@ class Deviation:
         filename    = os.path.basename(parsedURL[2])+'.original'
 
         # os.open *should* give a thread-safe way to exlusivly open files
+        flags       = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        filepath    = os.path.join(path,filename)
         try:
-            flags       = os.O_CREAT | os.O_EXCL | os.O_WRONLY
-            filepath    = os.path.join(path,filename)
-            fd          = os.open(os.path.normpath(filepath), flags)
-            f           = os.fdopen(fd, 'w')
+            fd = os.open(os.path.normpath(filepath), flags)
         except:
             return
+        f = os.fdopen(fd, 'w')
 
         # Load the page
         page    = self.session.get(self.url)
@@ -219,14 +219,14 @@ class Deviation:
             pass
 
         # os.open *should* give a thread-safe way to exlusivly open files
+        filepath = os.path.join(path,self.avatar)
         try:
-            # os.O_BINARY is only avilable and needed on windows
-            try:
-                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
-            except:
-                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY
-            filepath    = os.path.join(path,self.avatar)
-            fd          = os.open(os.path.normpath(filepath), flags)
+            # os.O_BINARY is only defined and needed on windows
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+        except:
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        try:
+            fd = os.open(os.path.normpath(filepath), flags)
         except:
             return
 

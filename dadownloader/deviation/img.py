@@ -59,16 +59,17 @@ class Img(Deviation):
             downloaded. Default to current working directory.
         """
         # os.open *should* give a thread-safe way to exlusivly open files
+        filepath = os.path.join(path,self.img)
         try:
             # os.O_BINARY is only avilable and needed on windows
-            try:
-                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
-            except:
-                flags   = os.O_CREAT | os.O_EXCL | os.O_WRONLY
-            filepath    = os.path.join(path,self.img)
-            fd          = os.open(os.path.normpath(filepath), flags)
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+        except:
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        try:
+            fd = os.open(os.path.normpath(filepath), flags)
         except:
             return
+
 
         response = self.session.get(self.imgurl, stream=True)
         if response.status_code == 200:
