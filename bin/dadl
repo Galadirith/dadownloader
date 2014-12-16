@@ -1,15 +1,11 @@
 #! /usr/bin/env python
 
 import  sys
-import  json
-import  os
 from    dadownloader.auth        import Auth
 from    dadownloader.favourites  import Favourites
 
 if len(sys.argv) == 2:
-  session = Auth().auth()
+  session     = Auth().auth()
   favourites  = Favourites(sys.argv[1], session)
-  with open(sys.argv[1]+'.json', 'w+') as f:
-    json.dump(favourites.toDict(), f, indent=2)
 else:
   print('Wrong number of arguments: %i' % (len(sys.argv)-1))

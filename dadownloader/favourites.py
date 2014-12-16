@@ -3,6 +3,7 @@ from    StringIO                import StringIO
 from    lxml                    import etree
 from    collections             import OrderedDict
 import  os
+import  json
 
 class Favourites:
     """
@@ -45,6 +46,9 @@ class Favourites:
         # Identify and process all collections
         if self.grabCols() == False:
             print(' Failed to identify any remaining collections')
+
+        with open(username+'.json', 'w+') as f:
+            json.dump(self.toDict(), f, indent=2)
 
         # Return to original working directory
         os.chdir(cwd)
