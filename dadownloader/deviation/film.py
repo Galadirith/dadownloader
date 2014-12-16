@@ -5,6 +5,7 @@ from StringIO                           import StringIO
 from lxml                               import etree
 from collections                        import OrderedDict
 import json
+import os
 
 class Film(Deviation):
     """
@@ -74,9 +75,30 @@ class Film(Deviation):
 
     def download(self, path=''):
         """
-        Download resources associated with deviation
+        Download film file associated with deviation
 
         :param str path: Directory path to where the resources should be
             downloaded. Default to current working directory.
         """
-        return
+        # os.open *should* give a thread-safe way to exlusivly open files
+        filepath = os.path.join(path,self.film)
+        filepath = os.path.normpath(filepath)
+        try:
+            # os.O_BINARY is only avilable and needed on windows
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+        except:
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        try:
+            fd = os.open(filepath, flags)
+        except:
+            return
+
+        try:
+            response = self.session.get(self.filmurl, stream=True)
+            if response.status_code == 200:
+                for chunk in response.iter_content(1024):
+                    os.write(fd, chunk)
+        except:
+            # Remove partial img file if request or stream fails
+            os.close(fd)
+            os.remove(filepath)
