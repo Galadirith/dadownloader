@@ -2,6 +2,7 @@ from    dadownloader.collection import Collection
 from    StringIO                import StringIO
 from    lxml                    import etree
 from    collections             import OrderedDict
+import  os
 
 class Favourites:
     """
@@ -31,7 +32,22 @@ class Favourites:
         self.session        = session
         self.collections    = []
 
+        # Identify current working directory
+        cwd = os.getcwd()
+
+        # Create encapsulating folder and make working directory
+        try:
+            os.mkdir(username)
+        except OSError:
+            pass
+        os.chdir(username)
+
+        # Identify and process all collections
         self.grabCols()
+
+        # Return to original working directory
+        os.chdir(cwd)
+
 
     def pushCol(self, name, url):
         """

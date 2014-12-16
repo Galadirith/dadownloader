@@ -38,13 +38,22 @@ class Collection:
         self.collection = []
         self.session    = session
 
+        # Identify current working directory
+        cwd = os.getcwd()
+
+        # Create encapsulating folder for collection and make working directory
         try:
             os.mkdir(self.name)
         except OSError:
             # Passed if folder exists so its probably OK :D
             pass
+        os.chdir(self.name)
 
+        # Identify and process all deviations in the collection
         self.grabCol()
+
+        # Return to original working directory
+        os.chdir(cwd)
 
     def grabCol(self):
         """Adds all favourite devations in the collection to this container"""
@@ -67,8 +76,8 @@ class Collection:
             # Push the deviation into the collection
             for j in range(len(deviations)):
                 self.pushFav(deviations[j])
-                self.collection[-1].download(self.name)
-                self.collection[-1].downloadDescription(self.name)
+                self.collection[-1].download()
+                self.collection[-1].downloadDescription()
                 self.collection[-1].downloadAvatar()
                 progressBar('  Deviations', j+1+i*24, deviationsCount)
 
