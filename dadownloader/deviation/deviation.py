@@ -137,14 +137,21 @@ class Deviation:
         # os.open *should* give a thread-safe way to exlusivly open files
         flags       = os.O_CREAT | os.O_EXCL | os.O_WRONLY
         filepath    = os.path.join(path,filename)
+        filepath    = os.path.normpath(filepath)
         try:
-            fd = os.open(os.path.normpath(filepath), flags)
+            fd = os.open(filepath, flags)
         except:
             return
         f = os.fdopen(fd, 'w')
 
         # Load the page
-        page    = self.session.get(self.url)
+        try:
+            page = self.session.get(self.url)
+        except:
+            # Remove the empty file if the remote request failed
+            f.close()
+            os.remove(filepath)
+            return
         parser  = etree.HTMLParser(remove_blank_text=True)
         pageXML = etree.parse(StringIO(page.text), parser)
 
@@ -220,17 +227,23 @@ class Deviation:
 
         # os.open *should* give a thread-safe way to exlusivly open files
         filepath = os.path.join(path,self.avatar)
+        filepath = os.path.normpath(filepath)
         try:
             # os.O_BINARY is only defined and needed on windows
             flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
         except:
             flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
         try:
-            fd = os.open(os.path.normpath(filepath), flags)
+            fd = os.open(filepath, flags)
         except:
             return
 
-        response = self.session.get(self.avatarurl, stream=True)
-        if response.status_code == 200:
-            for chunk in response.iter_content(1024):
-                os.write(fd, chunk)
+        try:
+            response = self.session.get(self.avatarurl, stream=True)
+            if response.status_code == 200:
+                for chunk in response.iter_content(1024):
+                    os.write(fd, chunk)
+        except:
+            # Remove partial avatar file if request or stream fails
+            os.close(fd)
+            os.remove(filepath)

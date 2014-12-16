@@ -60,18 +60,23 @@ class Img(Deviation):
         """
         # os.open *should* give a thread-safe way to exlusivly open files
         filepath = os.path.join(path,self.img)
+        filepath = os.path.normpath(filepath)
         try:
             # os.O_BINARY is only avilable and needed on windows
             flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
         except:
             flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
         try:
-            fd = os.open(os.path.normpath(filepath), flags)
+            fd = os.open(filepath, flags)
         except:
             return
 
-
-        response = self.session.get(self.imgurl, stream=True)
-        if response.status_code == 200:
-            for chunk in response.iter_content(1024):
-                os.write(fd, chunk)
+        try:
+            response = self.session.get(self.imgurl, stream=True)
+            if response.status_code == 200:
+                for chunk in response.iter_content(1024):
+                    os.write(fd, chunk)
+        except:
+            # Remove partial img file if request or stream fails
+            os.close(fd)
+            os.remove(filepath)
