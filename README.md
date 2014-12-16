@@ -5,15 +5,39 @@ A simple python program to help you download your favourite deviations from
 
 ## Installation
 
+````bash
+$ pip install https://github.com/Galadirith/dadownloader/archive/master.zip
+````
+
+### Requirements
+
+- [Python 2.7.x](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/latest/installing.html)
+
 ## Usage
 
-Navigate to the folder where you would like to download the deviations and execute the following command:
+Navigate to the folder where you would like to download the deviations and
+execute the following command:
 
 ````bash
 $ dadl <username>
 ````
 where `<username>` is the username of the DeviantArt user whos favourites you
-want to download. It is suggested you only execute `dadl` in an empty folder or a folder in which `dadl` was previously executed.
+want to download. It is suggested you only execute `dadl` in an empty folder or
+a folder in which `dadl` was previously executed.
+
+`dadl` may prompt you for your log in details for DeviantArt. This is to access
+and restricted deviations that may be in the favourites you wish to download:
+
+````bash
+$ dadl <username>
+If you want to access restricted content please provide login detail.
+Username: <your-username>
+Password: <your-password>
+````
+
+If you would prefer not to log in to DeviantArt through `dadl` you can simply
+leave the `Username` blank and `dadl` will simply ignore any restricted content.
 
 ### File Descriptions
 
