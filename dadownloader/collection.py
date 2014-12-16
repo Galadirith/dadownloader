@@ -62,7 +62,12 @@ class Collection:
         print(' '+self.name)
 
         # Generate ElementTree list of every page in the collection
-        pages, deviationsCount = self.grabPages()
+        pages = self.grabPages()
+        if pages == None:
+            print('  Failed to load collection')
+            return
+        else:
+            pages, deviationsCount = pages
 
         # Start a progress bar to report deviations with meta data harvested
         progressBar('  Deviations', 0, deviationsCount)
@@ -87,10 +92,14 @@ class Collection:
 
         :rtype: (lxml.etree.ElementTree[], int)
         :return: (List of every page in the collection, number of deviations in
-            the collection)
+            the collection). If any of the remote requests fail with a
+            connection error `None` is returned.
         """
         # Request the collections root page
-        rootResponse    = self.session.get(self.url)
+        try:
+            rootResponse = self.session.get(self.url)
+        except:
+            return None
 
         # Find number of pages in collection
         parser          = etree.HTMLParser()
@@ -104,9 +113,13 @@ class Collection:
         # Now request any further pages that exist in the collection
         pagesResponses = []
         for i in range(pagesCount-1):
-            pagesResponses.append(
-                self.session.get(self.url+'?offset=%i' % ((i+1)*24))
-            )
+            try:
+                response = self.session.get(self.url+'?offset=%i' % ((i+1)*24))
+            except:
+                progressBar('  Pages', pagesCount, pagesCount)
+                return None
+            pagesResponses.append(response)
+
             # Be kind to the server
             time.sleep(1)
             progressBar('  Pages', i+2, pagesCount)

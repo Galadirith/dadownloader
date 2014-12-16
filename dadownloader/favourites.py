@@ -43,7 +43,8 @@ class Favourites:
         os.chdir(username)
 
         # Identify and process all collections
-        self.grabCols()
+        if self.grabCols() == False:
+            print(' Failed to identify any remaining collections')
 
         # Return to original working directory
         os.chdir(cwd)
@@ -65,8 +66,11 @@ class Favourites:
         # Add the root collection
         self.pushCol('Favourites', self.favurl)
 
-        # Load the deviants root collection page
-        root = self.session.get(self.favurl)
+        # Load the root collection page to identify any further collections
+        try:
+            root = self.session.get(self.favurl)
+        except:
+            return False
 
         # Harvest the name and url of each sub-collection
         parser      = etree.HTMLParser()
@@ -77,6 +81,8 @@ class Favourites:
         # Push each sub-collection to collections
         for i in range(len(colNames)):
             self.pushCol(colNames[i], colURLs[i])
+
+        return True
 
     def toDict(self):
         """Return the instance fields as a dictionary"""
