@@ -109,19 +109,13 @@ class Deviation:
         """
         pass
 
-    def downloadDescription(self, path=''):
-        """
-        Download description associated with deviation
-
-        :param str path: Directory path to where the resources should be
-            downloaded. Default to current working directory.
-        """
+    def downloadDescription(self):
+        """Download description associated with deviation"""
 
         # STAGE 1: Download description html
 
         # Create description directory if it doesn't exist
-        path = os.path.join(path,'descriptions')
-        path = os.path.normpath(path)
+        path = 'descriptions'
         try:
             os.mkdir(path)
         except OSError:
