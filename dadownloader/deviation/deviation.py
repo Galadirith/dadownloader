@@ -99,18 +99,15 @@ class Deviation:
             ('avatarurl',   self.avatarurl)
         ))
 
-    def download(self, path=''):
+    def download(self):
         """
-        Download resources associated with deviation
+        Download resources associated with deviation to working directory
 
         This method should be overriden by any sub-class that has remote
         resources that need to be downloaded, such as img files, data files,
-        description text etc.
-
-        :param str path: Directory path to where the resources should be
-            downloaded. Default to current working directory.
+        films files etc.
         """
-        return
+        pass
 
     def downloadDescription(self, path=''):
         """

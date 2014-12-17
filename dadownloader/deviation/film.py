@@ -73,16 +73,11 @@ class Film(Deviation):
         ))
         return fields
 
-    def download(self, path=''):
-        """
-        Download film file associated with deviation
+    def download(self):
+        """Download film file associated with deviation to working direcotry"""
 
-        :param str path: Directory path to where the resources should be
-            downloaded. Default to current working directory.
-        """
         # os.open *should* give a thread-safe way to exlusivly open files
-        filepath = os.path.join(path,self.film)
-        filepath = os.path.normpath(filepath)
+        filepath = self.film
         try:
             # os.O_BINARY is only avilable and needed on windows
             flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
