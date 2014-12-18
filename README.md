@@ -1,5 +1,7 @@
 # DeviantArt Downloader
 
+<center>![dadl](https://raw.githubusercontent.com/Galadirith/dadownloader/master/imgs/dadownloader-shadow.png)</center>
+
 A simple python program to help you download your favourite deviations from
 [DeviantArt](http://www.deviantart.com).
 
