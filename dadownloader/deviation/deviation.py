@@ -31,6 +31,8 @@ class Deviation:
     :var str avatar: File name + extension of the avatar of the creator.
     :var str avatarurl: URL of the avatar of the creator.
     :var int submitted: Unix timestamp for the date the deviation was submitted.
+    :var str downloadurl: URL to the original file if the creator enabled this
+        option when submitting the deviation. None otherwise.
     :var requests.Session session: An instance through which all remote requests
         should be made.
     """
@@ -67,6 +69,7 @@ class Deviation:
         self.avatarurl  = deviation.xpath(
             './/span[@class="tt-fh-tc"]'\
             '/../../@usericon')[0]
+        self.downloadurl = None
         self.session = session
 
         # Some of the avatar URLs have a query string which we want to strip
@@ -151,6 +154,13 @@ class Deviation:
             '//div[contains(@class,"dev-description")]'\
             '//div[@class="text block"]')[0]
         f.write(etree.tostring(description, pretty_print=True))
+
+        # Find the downloadurl if it exists
+        try:
+            self.downloadurl = pageXML.xpath(
+                '//a[contains(@class,"dev-page-download")]/@href')[0]
+        except:
+            pass
 
         # STAGE 2: Download description images and point descriptions as them
 

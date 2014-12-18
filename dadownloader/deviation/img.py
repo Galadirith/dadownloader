@@ -53,7 +53,7 @@ class Img(Deviation):
 
     def download(self):
         """Download image file associated with deviation to working directory"""
-        
+
         # os.open *should* give a thread-safe way to exlusivly open files
         filepath = self.img
         try:
@@ -66,8 +66,13 @@ class Img(Deviation):
         except:
             return
 
+        if self.downloadurl != None:
+            url = self.downloadurl
+        else:
+            url = self.imgurl
+
         try:
-            response = self.session.get(self.imgurl, stream=True)
+            response = self.session.get(url, stream=True)
             if response.status_code == 200:
                 for chunk in response.iter_content(1024):
                     os.write(fd, chunk)
