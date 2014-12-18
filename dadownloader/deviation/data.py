@@ -95,3 +95,39 @@ class Data(Deviation):
             # Remove partial img file if request or stream fails
             os.close(fd)
             os.remove(filepath)
+
+        # Download thumbnail
+        self.downloadThumbnail()
+
+    def downloadThumbnail(self):
+        """Download thumbnail associated with deviation to working directory"""
+
+        # Create thumbs directory in the working directory if it doesn't exist
+        path = 'thumbs'
+        try:
+            os.mkdir(path)
+        except OSError:
+            pass
+
+        # os.open *should* give a thread-safe way to exlusivly open files
+        filepath = os.path.join(path,self.thumb)
+        filepath = os.path.normpath(filepath)
+        try:
+            # os.O_BINARY is only avilable and needed on windows
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_BINARY
+        except:
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        try:
+            fd = os.open(filepath, flags)
+        except:
+            return
+
+        try:
+            response = self.session.get(self.thumburl, stream=True)
+            if response.status_code == 200:
+                for chunk in response.iter_content(1024):
+                    os.write(fd, chunk)
+        except:
+            # Remove partial img file if request or stream fails
+            os.close(fd)
+            os.remove(filepath)
