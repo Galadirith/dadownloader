@@ -16,18 +16,30 @@ $ pip install https://github.com/Galadirith/dadownloader/archive/master.zip
 
 ## Usage
 
+````bash
+$ dadl [options] <username>
+
+Arguments:
+<username>  The username of the DeviantArt user whos favourites you want
+            to download.
+
+Options:
+-a        Download the avatar of the creator of each deviations
+-d        Download the description of each deviation
+-f        Download the file (eg img file) associated with each deviation
+-h --help Show dadl help menu (this screen)
+````
+
 Navigate to the folder where you would like to download the deviations and
-execute the following command:
+execute `dadl`. It is suggested you only execute `dadl` in an empty folder or a
+folder in which `dadl` was previously executed. If you want to download all of
+the data for each deviation you can simply run the command:
 
 ````bash
-$ dadl <username>
+$ dadl -adf <username>
 ````
-where `<username>` is the username of the DeviantArt user whos favourites you
-want to download. It is suggested you only execute `dadl` in an empty folder or
-a folder in which `dadl` was previously executed.
 
-`dadl` may prompt you for your log in details for DeviantArt. This is to access
-and restricted deviations that may be in the favourites you wish to download:
+### Login Details
 
 ````bash
 $ dadl <username>
@@ -36,15 +48,18 @@ Username: <your-username>
 Password: <your-password>
 ````
 
-If you would prefer not to log in to DeviantArt through `dadl` you can simply
-leave the `Username` blank and `dadl` will simply ignore any restricted content.
+`dadl` may prompt you for your log in details for DeviantArt. This is to access
+any restricted deviations that may be in the favourites you wish to download. If
+you would prefer not to log in to DeviantArt through `dadl` you can simply leave
+the `Username` blank and `dadl` will download as much information as it can if
+it encounters restricted deviations.
 
 ### File Descriptions
 
 `dadl` will create a directory structure similar to the following:
 
 ````bash
-working-directory/
+./
 ├── cookies
 ├── credentials
 ├── <username>.json
@@ -84,19 +99,22 @@ working-directory/
 - **&lt;username&gt;.json**  
   Stores a json representation of &lt;username&gt;'s favourites.
 - **&lt;username&gt;**  
-  Folder in which all deviations, deviation descriptions and avatars are stored.
-- **&lt;collection-xxx-name&gt;**  
-  Folder in which all deviations, deviation descriptions and avatars for this
-  collection are stored. Note that the first collections name is always
-  `Favourites`
-- **avatars**  
-  Folder in which all avatars of the creators of the deviations in this
-  collection are stored.
-- **descriptions**  
-  Folder in which all descriptions of the deviations in this collection are
-  stored.
-- **imgs**  
-  Folder in which any images in the descriptions are stored.
+  Folder in which all deviations, deviation descriptions and avatars are
+  downloaded.
+  - **&lt;collection-xxx-name&gt;**  
+    Folder in which all deviations, deviation descriptions and avatars for this
+    collection are downloaded. Note that the first collections name is always
+    `Favourites`
+    - **avatars**  
+      Folder in which all avatars of the creators of the deviations in this
+      collection are downloaded.
+    - **descriptions**  
+      Folder in which all descriptions of the deviations in this collection are
+      downloaded. The original html is saved as a `.original` file along with a
+      modified `.html` version that uses the `./img` sub-directory as its source
+      for any images in the description.
+    - **imgs**  
+      Folder in which any images in the descriptions are downloaded.
 
 ## License
 

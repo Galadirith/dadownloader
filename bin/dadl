@@ -5,8 +5,29 @@ from    dadownloader.auth        import Auth
 from    dadownloader.favourites  import Favourites
 from    getopt                   import getopt
 
-opts, args  = getopt(sys.argv[1:], 'adf')
+try:
+  opts, args  = getopt(sys.argv[1:], 'adfh', ['help'])
+except:
+  print('Invalid options passed to dadl')
+  sys.exit()
+
 download    = {}
+
+def usage():
+  print\
+  '''
+  dadl [options] <username>
+
+  Arguments:
+  <username>  The username of the DeviantArt user whos favourites you want
+              to download.
+
+  Options:
+  -a        Download the avatar of the creator of each deviations
+  -d        Download the description of each deviation
+  -f        Download the file (eg img file) associated with each deviation
+  -h --help Show dadl help menu (this screen)
+  '''
 
 # Unpack command line options
 for opt, value in opts:
@@ -21,6 +42,11 @@ for opt, value in opts:
   # Download files?
   if opt == '-f':
     download['files'] = True
+
+  # Show help
+  if opt in ('-h', '--help'):
+    usage()
+    sys.exit()
 
 if len(args) == 1:
   session     = Auth().auth()
