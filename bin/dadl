@@ -3,9 +3,27 @@
 import  sys
 from    dadownloader.auth        import Auth
 from    dadownloader.favourites  import Favourites
+from    getopt                   import getopt
 
-if len(sys.argv) == 2:
+opts, args  = getopt(sys.argv[1:], 'adf')
+download    = {}
+
+# Unpack command line options
+for opt, value in opts:
+  # Download avatars?
+  if opt == '-a':
+    download['avatars'] = True
+
+  # Download descriptions?
+  if opt == '-d':
+    download['descriptions'] = True
+
+  # Download files?
+  if opt == '-f':
+    download['files'] = True
+
+if len(args) == 1:
   session     = Auth().auth()
-  favourites  = Favourites(sys.argv[1], session)
+  favourites  = Favourites(args[0], session, **download)
 else:
   print('Wrong number of arguments: %i' % (len(sys.argv)-1))

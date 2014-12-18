@@ -19,19 +19,35 @@ class Favourites:
         including the root collection of the users favourites.
     :var requests.Session session: An instance through which all remote requests
         should be made.
+    var bool avatars: If True the avatar of the creator of each deviation will
+        be downloaded.
+    :var bool descriptions: If True the description of each deviations will be
+        downloaded.
+    :var bool files: If True the file asociated with each deviation (such as and
+        image or film file) will be downloaded.
     """
 
-    def __init__(self, username, session):
+    def __init__(self, username, session, avatars=False, descriptions=False, files=False):
         """
         :param str username: Username of the deviant from whom we wish to
             download the favourites from.
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param bool avatars: If True the avatar of the creator of each deviation
+            will be downloaded.
+        :param bool descriptions: If True the description of each deviations
+            will be downloaded.
+        :param bool files: If True the file asociated with each deviation (such
+            as and image or film file) will be downloaded.
         """
         self.url            = 'http://%s.deviantart.com' % username
         self.favurl         = self.url+'/favourites/'
         self.session        = session
         self.collections    = []
+
+        self.avatars        = avatars
+        self.descriptions   = descriptions
+        self.files          = files
 
         # Identify current working directory
         cwd = os.getcwd()
@@ -61,7 +77,8 @@ class Favourites:
         :param str name: Name of the collection
         :param str url: URL to the collection
         """
-        collection = Collection(name, url, self.session)
+        collection = Collection(
+            name, url, self.session, self.avatars, self.descriptions, self.files)
         self.collections.append(collection)
 
     def grabCols(self):

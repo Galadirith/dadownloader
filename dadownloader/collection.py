@@ -24,19 +24,35 @@ class Collection:
         deviations in the collection.
     :var requests.Session session: An instance through which all remote requests
         should be made.
+    var bool avatars: If True the avatar of the creator of each deviation will
+        be downloaded.
+    :var bool descriptions: If True the description of each deviations will be
+        downloaded.
+    :var bool files: If True the file asociated with each deviation (such as and
+        image or film file) will be downloaded.
     """
 
-    def __init__(self, name, url, session):
+    def __init__(self, name, url, session, avatars=False, descriptions=False, files=False):
         """
         :param str name: Name of the collection
         :param str url: URL to the collection
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param bool avatars: If True the avatar of the creator of each deviation
+            will be downloaded.
+        :param bool descriptions: If True the description of each deviations will
+            be downloaded.
+        :param bool files: If True the file asociated with each deviation (such
+            as and image or film file) will be downloaded.
         """
         self.name       = name
         self.url        = url
         self.collection = []
         self.session    = session
+
+        self.avatars        = avatars
+        self.descriptions   = descriptions
+        self.files          = files
 
         # Identify current working directory
         cwd = os.getcwd()
@@ -56,7 +72,9 @@ class Collection:
         os.chdir(cwd)
 
     def grabCol(self):
-        """Adds all favourite devations in the collection to this container"""
+        """
+        Adds all favourite devations in the collection to this container
+        """
 
         # Report the collection that is being processed
         print(' '+self.name)
@@ -81,9 +99,12 @@ class Collection:
             # Push the deviation into the collection
             for j in range(len(deviations)):
                 self.pushFav(deviations[j])
-                self.collection[-1].download()
-                self.collection[-1].downloadDescription()
-                self.collection[-1].downloadAvatar()
+                if self.avatars:
+                    self.collection[-1].downloadAvatar()
+                if self.descriptions:
+                    self.collection[-1].downloadDescription()
+                if self.files:
+                    self.collection[-1].download()
                 progressBar('  Deviations', j+1+i*24, deviationsCount)
 
     def grabPages(self):
