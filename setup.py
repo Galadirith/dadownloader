@@ -7,7 +7,7 @@ setup(
     url         = 'http://github.com/Galadirith/dadownloader',
     license     = 'MIT',
     packages    = find_packages(),
-    scripts     = ['bin/dadl'],
+    scripts     = ['bin/dadl', 'bin/dacl'],
     install_requires = ['requests', 'lxml'],
     zip_safe    = False
 )

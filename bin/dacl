@@ -1,0 +1,48 @@
+#! /usr/bin/env python
+
+import  sys
+from    dadownloader.clean.favourites import Favourites
+from    getopt                        import getopt
+
+try:
+  opts, args  = getopt(sys.argv[1:], 'hr', ['help'])
+except:
+  print('Invalid options passed to dadl')
+  sys.exit()
+
+def usage():
+  print\
+  '''
+  dacl <username>
+
+  Display the files that are not a part of the favourites library of
+  <username> previously downloaded by dadl in the current directory.
+
+  Arguments:
+  <username>  The username of the DeviantArt user whos favourites
+              library has been downloaded to ./<username> using dadl.
+
+  Options:
+  -r          Delete the displayed non-library files.
+  -h --help   Show dadl help menu (this screen)
+  '''
+
+remove = False
+
+# Unpack command line options
+for opt, value in opts:
+
+  # Delete files?
+  if opt == '-r':
+    remove = True
+
+  # Show help
+  if opt in ('-h', '--help'):
+    usage()
+    sys.exit()
+
+if len(args) == 1:
+  clean = Favourites(args[0])
+  clean.clean(remove)
+else:
+  print('Wrong number of arguments: %i' % (len(sys.argv)-1))
