@@ -12,15 +12,17 @@ class Img(Deviation):
     :var str imgurl: URL to the img.
     """
 
-    def __init__(self, deviation, session, page=None):
+    def __init__(self, deviation, session, page=None, index=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
         :param lxml.etree.Element page: The deviations page.
+        :param int index: Index of deviation with a set, for example its
+            position in a collection of a favourites library on DeviantArt.
         """
-        Deviation.__init__(self, 'img', deviation, session)
+        Deviation.__init__(self, 'img', deviation, session, index=index)
 
         if page == None:
             # If imgurl not under data-super-full-img it is under data-super-img

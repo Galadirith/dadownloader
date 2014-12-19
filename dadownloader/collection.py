@@ -98,7 +98,7 @@ class Collection:
 
             # Push the deviation into the collection
             for j in range(len(deviations)):
-                self.pushFav(deviations[j])
+                self.pushFav(deviations[j], index=(j+1+i*24))
                 if self.avatars:
                     self.collection[-1].downloadAvatar()
                 if self.descriptions:
@@ -155,7 +155,7 @@ class Collection:
 
         return (pagesXML, int(deviationsCount))
 
-    def pushFav(self, deviation):
+    def pushFav(self, deviation, index=None):
         """
         Adds a favourite deviation to the collection
 
@@ -168,33 +168,36 @@ class Collection:
         # Is it an img deviation?
         devType = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@data-super-img')
         if len(devType) == 1:
-            self.collection.append(Img(deviation, self.session))
+            self.collection.append(Img(deviation, self.session, index=index))
             return
 
         # Is is a film deviation?
         devType = deviation.xpath('.//span[@class="tt-fh-tc"]//b[@class="film"]')
         if len(devType) == 1:
-            self.collection.append(Film(deviation, self.session))
+            self.collection.append(Film(deviation, self.session, index=index))
             return
 
         # Is it a text deviation? Currently no explict handler class
         devType = deviation.xpath('.//span[@class="tt-fh-tc"]//img[@class="lit"]')
         if len(devType) == 1:
-            self.collection.append(Deviation('text', deviation, self.session))
+            self.collection.append(Deviation('text', deviation, self.session, index=index))
             return
 
         # If inconclusive we must open the deviations page to determine its type
         # as there has been a case where an img deviation has no @data-super-img
         # attribute
         url     = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@href')[0]
-        page    = self.session.get(url)
+        try:
+            page = self.session.get(url)
+        except:
+            self.collection.append(Deviation('error', deviation, self.session, index=index))
         parser  = etree.HTMLParser()
         pageXML = etree.parse(StringIO(page.text), parser)
 
         # Is the deviation restricted content?
         restricted = pageXML.xpath('//div[@id="filter-warning"]')
         if len(restricted) == 1:
-            self.collection.append(Deviation('restricted', deviation, self.session))
+            self.collection.append(Deviation('restricted', deviation, self.session, index=index))
             return
 
         # Is there an img size?
@@ -202,20 +205,20 @@ class Collection:
             '//div[contains(@class,"dev-metainfo-details")]'\
             '/dl/dt[text()="Image Size"]')
         if len(imgSize) == 0:
-             self.collection.append(Data(deviation, self.session, pageXML))
+             self.collection.append(Data(deviation, self.session, page=pageXML, index=index))
              return
 
         # Case on img and flash files that both have an imgSize
         flash = pageXML.xpath('//div[@id="flashed-in"]')
         if len(flash) == 1:
-            self.collection.append(Data(deviation, self.session, pageXML))
+            self.collection.append(Data(deviation, self.session, page=pageXML, index=index))
             return
         else:
-            self.collection.append(Img(deviation, self.session, pageXML))
+            self.collection.append(Img(deviation, self.session, page=pageXML, index=index))
             return
 
         # It it reaches here then the type is indeterminable
-        self.collection.append(Deviation('unknown', deviation, self.session))
+        self.collection.append(Deviation('unknown', deviation, self.session, index=index))
 
 
     def toDict(self):

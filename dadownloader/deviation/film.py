@@ -18,15 +18,17 @@ class Film(Deviation):
     :var str filmurl: URL to the film file.
     """
 
-    def __init__(self, deviation, session, page=None):
+    def __init__(self, deviation, session, page=None, index=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
         :param lxml.etree.Element page: The deviations page.
+        :param int index: Index of deviation with a set, for example its
+            position in a collection of a favourites library on DeviantArt.
         """
-        Deviation.__init__(self, 'film', deviation, session)
+        Deviation.__init__(self, 'film', deviation, session, index=index)
 
         # Determine thumbnail details
         self.thumburl = deviation.xpath(

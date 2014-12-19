@@ -23,15 +23,17 @@ class Data(Deviation):
     :var str dataurl: URL to the data file.
     """
 
-    def __init__(self, deviation, session, page=None):
+    def __init__(self, deviation, session, page=None, index=None):
         """
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
         :param lxml.etree.Element page: The deviations page.
+        :param int index: Index of deviation with a set, for example its
+            position in a collection of a favourites library on DeviantArt.
         """
-        Deviation.__init__(self, 'data', deviation, session)
+        Deviation.__init__(self, 'data', deviation, session, index=index)
 
         # Determine thumbnail details.
         # I discovered I could mod the url to get a bigger thumbnail image.

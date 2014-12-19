@@ -23,7 +23,8 @@ class Deviation:
         restricted  == A restricted deviation. This type will only occur if
             session is not logged in to DeviantArt. All the xpath queries in
             this class are valid for restricted content.
-        unknown     == 'Unknown deviation type'
+        unknown     == Unknown deviation type
+        error       == There was an error processing the deviation
     :var str title: Title of the deviation.
     :var str url: URL to the deviations page.
     :var str creator: Deviant who created the deviation.
@@ -33,17 +34,21 @@ class Deviation:
     :var int submitted: Unix timestamp for the date the deviation was submitted.
     :var str downloadurl: URL to the original file if the creator enabled this
         option when submitting the deviation. None otherwise.
+    :var int index: Index of deviation with a set, for example its position in
+        a collection of a favourites library on DeviantArt.
     :var requests.Session session: An instance through which all remote requests
         should be made.
     """
 
-    def __init__(self, type, deviation, session):
+    def __init__(self, type, deviation, session, index=None):
         """
         :param str type: Type of deviation.
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         :param requests.Session session: An instance through which all remote
             requests should be made.
+        :param int index: Index of deviation within a set, for example its
+            position in a collection of a favourites library on DeviantArt.
         """
         self.type       = type
         self.title      = deviation.xpath(
@@ -83,6 +88,7 @@ class Deviation:
         datestr         = re.sub(r'^.*?, (?=(?:.{3} .{1,2}?, .{4}))', r'', datestr)
         date            = datetime.strptime(datestr, '%b %d, %Y')
         self.submitted  = timegm(date.timetuple())
+        self.index      = index
 
     def toDict(self):
         """
@@ -91,16 +97,30 @@ class Deviation:
         :rtype: OrderedDict
         :return: An ordered dictionary of the instance fields of this deviation.
         """
-        return OrderedDict((
-            ('type',        self.type),
-            ('title',       self.title),
-            ('submitted',   self.submitted),
-            ('url',         self.url),
-            ('creator',     self.creator),
-            ('creatorurl',  self.creatorurl),
-            ('avatar',      self.avatar),
-            ('avatarurl',   self.avatarurl)
-        ))
+        if self.index != None:
+            fields = OrderedDict((
+                ('index',       self.index),
+                ('type',        self.type),
+                ('title',       self.title),
+                ('submitted',   self.submitted),
+                ('url',         self.url),
+                ('creator',     self.creator),
+                ('creatorurl',  self.creatorurl),
+                ('avatar',      self.avatar),
+                ('avatarurl',   self.avatarurl)
+            ))
+        else:
+            fields = OrderedDict((
+                ('type',        self.type),
+                ('title',       self.title),
+                ('submitted',   self.submitted),
+                ('url',         self.url),
+                ('creator',     self.creator),
+                ('creatorurl',  self.creatorurl),
+                ('avatar',      self.avatar),
+                ('avatarurl',   self.avatarurl)
+            ))
+        return fields
 
     def download(self):
         """
