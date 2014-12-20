@@ -6,6 +6,7 @@ from    dadownloader.deviation.deviation    import Deviation
 from    dadownloader.deviation.img          import Img
 from    dadownloader.deviation.film         import Film
 from    dadownloader.deviation.data         import Data
+from    dadownloader.auth                   import Auth
 from    StringIO                            import StringIO
 from    lxml                                import etree
 from    collections                         import OrderedDict
@@ -165,6 +166,15 @@ class Collection:
         :param lxml.etree.Element deviation: A div element from a collections
             page that contains basic meta data about the deviation.
         """
+        # Catch restricted content early
+        restricted = deviation.xpath(
+            'contains(@class, "tt-ismature") or contains(@class, "tt-antisocial")')
+        if restricted:
+            # Restricted content is only a problem if not logged in
+            if Auth().verify(deviation) == 'BAD':
+                self.collection.append(Deviation('restricted', deviation, self.session, index=index))
+                return
+
         # Is it an img deviation?
         devType = deviation.xpath('.//span[@class="tt-fh-tc"]//a/@data-super-img')
         if len(devType) == 1:
@@ -194,7 +204,7 @@ class Collection:
         parser  = etree.HTMLParser()
         pageXML = etree.parse(StringIO(page.text), parser)
 
-        # Is the deviation restricted content?
+        # Is the deviation restricted content? (Legacy)
         restricted = pageXML.xpath('//div[@id="filter-warning"]')
         if len(restricted) == 1:
             self.collection.append(Deviation('restricted', deviation, self.session, index=index))

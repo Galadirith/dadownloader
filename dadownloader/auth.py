@@ -100,20 +100,27 @@ class Auth:
         self.session                        = requests.Session()
         self.session.headers['User-Agent']  = userAgent
 
-    def verify(self):
+    def verify(self, page=None):
         """
         Check if the current session is logged in to DeviantArt
 
+        :param :param lxml.etree.Element|ElementTree page: A previously loaded
+            DeviantArt page.
         :rtype: str
         :return: If the session is logged in to DeviantArt return 'GOOD',
             otherwise return 'BAD'.
         """
-        # Request the DeviantArt login page
-        response = self.session.get(self.url, headers={'Referer': self.url})
+        if page == None:
+            # Request the DeviantArt login page
+            response = self.session.get(self.url, headers={'Referer': self.url})
+
+            # Construct xml object from response
+            parser  = etree.HTMLParser()
+            doc     = etree.parse(StringIO(response.text), parser)
+        else:
+            doc     = page
 
         # Query element that only exists for loged in users
-        parser  = etree.HTMLParser()
-        doc     = etree.parse(StringIO(response.text), parser)
         login   = doc.xpath('//*[@id="oh-menu-deviant"]/a/span')
         if len(login) == 1:
             return 'GOOD'
