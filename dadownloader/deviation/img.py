@@ -47,10 +47,17 @@ class Img(Deviation):
         :return: An ordered dictionary of the instance fields of this deviation.
         """
         fields = Deviation.toDict(self)
-        fields.update((
-            ('img',     self.img),
-            ('imgurl',  self.imgurl)
-        ))
+        if self.downloadurl != None:
+            fields.update((
+                ('img',         self.img),
+                ('imgurl',      self.imgurl),
+                ('downloadurl', self.downloadurl)
+            ))
+        else:
+            fields.update((
+                ('img',     self.img),
+                ('imgurl',  self.imgurl)
+            ))
         return fields
 
     def download(self):
